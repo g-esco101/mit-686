@@ -77,53 +77,56 @@ def mstep(X: np.ndarray, post: np.ndarray, mixture: GaussianMixture,
     Returns:
         GaussianMixture: the new gaussian mixture
     """
-    _, K = post.shape  # K = number of mixture components
-    p_new = post.mean(axis=0)  # new mixture weights: average responsibility per component (shape (K,))
+    # number of mixture components
+    _, K = post.shape
 
-    mask = (X != 0)  # boolean mask of observed entries, shape (n, d)
-    user_watch_count = mask.sum(axis=1)  # number of observed movies per user, shape (n,)
+    # new mixture weights (shape (K,))
+    p_new = post.mean(axis=0)
 
-    mu_new = mixture.mu.copy()  # initialize new means with current values (shape (K, d))
-    var_new = np.zeros(K)  # container for new variances per component (shape (K,))
+    # boolean mask of observed entries (n, d)
+    mask = (X != 0)
+
+    # number of observed movies per user (n,)
+    user_watch_count = mask.sum(axis=1)
+
+    # initialize new means and variances
+    mu_new = mixture.mu.copy()
+    var_new = np.zeros(K)
 
     for k in range(K):
-        weights = post[:, k]  # responsibilities of all users for component k (shape (n,))
+        # responsibilities of all users for component k (n,)
+        weights = post[:, k]
 
-        # weighted_mask: for each user u and movie j -> weight_u * observed(u,j)
-        # shape (n, d). Used to compute weighted sums only over observed entries.
+        # weighted mask used to sum only over observed entries (n, d)
         weighted_mask = weights[:, None] * mask
 
-        # numerator for mu: sum_u weight_u * x_{u,j} over observed entries, per movie j (shape (d,))
+        # weighted sums and counts per movie (d,)
         mu_numerator = (weighted_mask * X).sum(axis=0)
-
-        # denominator for mu: sum_u weight_u over users who observed movie j (shape (d,))
         mu_denominator = weighted_mask.sum(axis=0)
 
-        mu = mu_new[k].copy()  # start from previous mean for component k
+        # start from previous mean for component k
+        mu = mu_new[k].copy()
 
-        # only update means for movies with enough effective weight (denominator >= 1.0)
+        # update means only where denominator is sufficiently large
         good = mu_denominator >= 1.0
-        mu[good] = mu_numerator[good] / mu_denominator[good]  # elementwise division for observed movies
-        mu_new[k] = mu  # store updated mean for component k
+        mu[good] = mu_numerator[good] / mu_denominator[good]
+        mu_new[k] = mu
 
-        # compute squared deviations only for observed entries:
-        # (X - mu) broadcasted across users, then masked to ignore missing entries
+        # squared errors computed only on observed entries (n, d)
         diff = (X - mu) * mask
-        sse = diff ** 2  # squared errors for observed entries, shape (n, d)
+        sse = diff ** 2
 
-        # numerator for variance: sum_u weight_u * sum_j (x_{u,j} - mu_{k,j})^2 over observed j
+        # weighted variance numerator and denominator
         var_numerator = (weights[:, None] * sse).sum()
-
-        # denominator for variance: effective number of observed entries weighted by responsibilities
-        # equals sum_u weight_u * #observed_movies_of_user_u
         var_denominator = (weights * user_watch_count).sum()
 
+        # fallback to current variance if denominator is zero
         if var_denominator > 0:
-            var = var_numerator / var_denominator  # weighted average squared error
+            var = var_numerator / var_denominator
         else:
-            var = mixture.var[k]  # fallback to previous variance when no data
+            var = mixture.var[k]
 
-        # enforce minimum variance to avoid numerical issues
+        # enforce minimum variance
         var_new[k] = max(var, min_variance)
 
     return GaussianMixture(mu_new, var_new, p_new)
@@ -206,9 +209,8 @@ def fill_matrix(X: np.ndarray, mixture: GaussianMixture) -> np.ndarray:
         log_px = logsumexp(f_u)
         post_u = np.exp(f_u - log_px)   # shape (K,)
 
-        # Predict missing entries: E[x_i] = Σ_k p(k|u) μ_i^{(k)}
         for i in range(d):
-            if X_complete[u, i] == 0:       # missing entry
+            if X_complete[u, i] == 0:
                 X_complete[u, i] = np.dot(post_u, mixture.mu[:, i])
 
     return X_complete
