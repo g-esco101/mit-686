@@ -34,9 +34,27 @@ def epsilon_greedy(state_1, state_2, q_func, epsilon):
     Returns:
         (int, int): the indices describing the action/object to take
     """
-    # TODO Your code here
-    action_index, object_index = None, None
-    return (action_index, object_index)
+    # With probability epsilon: explore (random action-object pair)
+    if np.random.rand() < epsilon:
+        action_index = np.random.randint(NUM_ACTIONS)
+        object_index = np.random.randint(NUM_OBJECTS)
+        return action_index, object_index
+
+    # Otherwise: exploit (greedy with respect to current Q-function)
+    # Slice Q(s, :, :) for the current state
+    q_state = q_func[state_1, state_2, :, :]          # shape (NUM_ACTIONS, NUM_OBJECTS)
+
+    # Find max Q value
+    max_q = np.max(q_state)
+
+    # All (a,o) pairs that achieve this max (to break ties randomly)
+    best_indices = np.argwhere(q_state == max_q)      # shape (k, 2)
+
+    # Choose one of the best pairs uniformly at random
+    chosen_idx = best_indices[np.random.randint(len(best_indices))]
+    action_index, object_index = int(chosen_idx[0]), int(chosen_idx[1])
+
+    return action_index, object_index
 
 
 # pragma: coderesponse end
@@ -60,12 +78,22 @@ def tabular_q_learning(q_func, current_state_1, current_state_2, action_index,
     Returns:
         None
     """
-    # TODO Your code here
-    q_func[current_state_1, current_state_2, action_index,
-           object_index] = 0  # TODO Your update here
+    q_func_copy = q_func[current_state_1, current_state_2,
+                   action_index, object_index]
 
-    return None  # This function shouldn't return anything
+    # Bootstrap term max_{c'} Q(s', c')
+    if terminal:
+        max_next_q = 0.0
+    else:
+        max_next_q = np.max(q_func[next_state_1, next_state_2, :, :])
 
+    # Target and update
+    target = reward + GAMMA * max_next_q
+    q_func_new = (1.0 - ALPHA) * q_func_copy + ALPHA * target
+
+    # Write back into the table
+    q_func[current_state_1, current_state_2,
+           action_index, object_index] = q_func_new
 
 # pragma: coderesponse end
 
@@ -124,7 +152,7 @@ def run_epoch():
     for _ in range(NUM_EPIS_TEST):
         rewards.append(run_episode(for_training=False))
 
-    return np.mean(np.array(rewards))
+    return np.mean(np.array(rewardsrewards))
 
 
 def run():
