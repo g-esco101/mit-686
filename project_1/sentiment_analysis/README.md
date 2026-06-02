@@ -72,7 +72,17 @@ python test.py
 ```
 
 The test suite validates each component including loss functions, update steps, full training loops, bag-of-words construction, and feature extraction.
-Running the Project
+
+## Running Experiments
+
+Different experiments can be enabled by commenting and uncommenting the relevant sections in `main.py`. For example:
+
+- To run a specific algorithm (perceptron, average perceptron, or pegasos), uncomment the corresponding training and plotting calls.
+- To tune hyperparameters (e.g., `T` for number of iterations, `L` for the regularization parameter in pegasos), uncomment the `tune_*` function calls.
+- To switch between binary and non-binary bag-of-words features, modify the `extract_bow_feature_vectors` call in the feature extraction section.
+- To test on the toy dataset vs. the sentiment dataset, comment/uncomment the respective `load_toy_data` or `load_data` calls.
+
+After configuring `main.py`, run the project with:
 
 ```bash
 python main.py
