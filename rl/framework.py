@@ -205,54 +205,54 @@ def make_all_states_index():
 
     return (dictionary_room_desc, dictionary_quest_desc)
 
-# def gameOver(room_index, quest_index, action_index, object_index):
-#     if (command_is_valid[room_index, action_index, object_index]==1):
-#         # quest has been finished
-#         if ((actions[action_index]==quest_actions[quest_index]) and (objects[object_index]==quest_objects[quest_index])):
-#             return (True)
+def gameOver(room_index, quest_index, action_index, object_index):
+    if (command_is_valid[room_index, action_index, object_index]==1):
+        # quest has been finished
+        if ((actions[action_index]==quest_actions[quest_index]) and (objects[object_index]==quest_objects[quest_index])):
+            return (True)
 
-#     return (False)
+    return (False)
 
-# def output_state(room_index, room_desc_index, quest_index):
-#     room_name = rooms[room_index]
-#     #print('Room: %s. %s.' %(room_name, rooms_desc[room_name][room_desc_index]))
-#     #print('Quest: %s' %(quests[quest_index]))
-#     room_desc = rooms_desc[room_name][room_desc_index]
-#     quest_desc = quests[quest_index]
-#     return (room_desc, quest_desc)
+def output_state(room_index, room_desc_index, quest_index):
+    room_name = rooms[room_index]
+    #print('Room: %s. %s.' %(room_name, rooms_desc[room_name][room_desc_index]))
+    #print('Quest: %s' %(quests[quest_index]))
+    room_desc = rooms_desc[room_name][room_desc_index]
+    quest_desc = quests[quest_index]
+    return (room_desc, quest_desc)
 
-# def output_command(action_index, object_index):
-#     print('Command: %s %s' %(actions[action_index], objects[object_index]))
-
-
-# load_game_data()
-# reward_cnt = 0
-# step = 0
-# max_steps = 300
-# game_count = 0
-
-# (current_room_desc, current_quest_desc, terminal) = newGame()
+def output_command(action_index, object_index):
+    print('Command: %s %s' %(actions[action_index], objects[object_index]))
 
 
-# while step<max_steps:
-#     step = step +1
+load_game_data()
+reward_cnt = 0
+step = 0
+max_steps = 300
+game_count = 0
 
-#     # pure random policy
-#     action_index = np.random.randint(NUM_ACTIONS)
-#     object_index = np.random.randint(NUM_OBJECTS)
-
-#     if DEBUG:
-#         print('Step %d: %s %s with Command: %s %s' % (step, current_room_desc, current_quest_desc, actions[action_index], objects[object_index],))
-
-#     (next_room_desc, next_quest_desc, reward, terminal) = step_game(current_room_desc, current_quest_desc, action_index, object_index)
-#     reward_cnt = reward_cnt + reward
-
-#     if terminal:
-#         (current_room_desc, current_quest_desc, terminal) = newGame()
-#         game_count = game_count + 1
-#     else:
-#         current_room_desc = next_room_desc
-#         current_quest_desc = next_quest_desc
+(current_room_desc, current_quest_desc, terminal) = newGame()
 
 
-# print('Finish %d games. Total reward %6.3f.' % (game_count, reward_cnt,))
+while step<max_steps:
+    step = step +1
+
+    # pure random policy
+    action_index = np.random.randint(NUM_ACTIONS)
+    object_index = np.random.randint(NUM_OBJECTS)
+
+    if DEBUG:
+        print('Step %d: %s %s with Command: %s %s' % (step, current_room_desc, current_quest_desc, actions[action_index], objects[object_index],))
+
+    (next_room_desc, next_quest_desc, reward, terminal) = step_game(current_room_desc, current_quest_desc, action_index, object_index)
+    reward_cnt = reward_cnt + reward
+
+    if terminal:
+        (current_room_desc, current_quest_desc, terminal) = newGame()
+        game_count = game_count + 1
+    else:
+        current_room_desc = next_room_desc
+        current_quest_desc = next_quest_desc
+
+
+print('Finish %d games. Total reward %6.3f.' % (game_count, reward_cnt,))

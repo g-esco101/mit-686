@@ -14,7 +14,7 @@ NUM_RUNS = 10
 NUM_EPOCHS = 200
 NUM_EPIS_TRAIN = 25  # number of episodes for training at each epoch
 NUM_EPIS_TEST = 50  # number of episodes for testing
-ALPHA = 0.1  # learning rate for training
+ALPHA = 0.000001# learning rate for training
 
 ACTIONS = framework.get_actions()
 OBJECTS = framework.get_objects()
@@ -23,6 +23,7 @@ NUM_OBJECTS = len(OBJECTS)
 
 
 # pragma: coderesponse template
+# q_func = [room, quest, action, object]
 def epsilon_greedy(state_1, state_2, q_func, epsilon):
     """Returns an action selected by an epsilon-Greedy exploration policy
 
@@ -110,30 +111,52 @@ def run_episode(for_training):
     Returns:
         None
     """
+
+    # When training we usually use a higher epsilon to encourage exploration.
+    # When testing we use a small epsilon so the agent behaves mostly greedily.
     epsilon = TRAINING_EP if for_training else TESTING_EP
 
-    epi_reward = None
-    # initialize for each episode
-    # TODO Your code here
-
-    (current_room_desc, current_quest_desc, terminal) = framework.newGame()
+    # epi_reward: the summation over t of gammat^t * reward_t.
+    epi_reward = 0.0
+    # discount: gamma^t.
+    discount = 1.0
+    current_room_desc, current_quest_desc, terminal = framework.newGame()
 
     while not terminal:
         # Choose next action and execute
-        # TODO Your code here
+        room_index = dict_room_desc[current_room_desc]
+        quest_index = dict_quest_desc[current_quest_desc]
+        # With probability epsilon, picks a random (action, object) pair - Exploration.
+        # With probability 1−epsilon, picks the pair with highest Q-value for this state - Exploitation.
+        action_index, object_index = epsilon_greedy(room_index, quest_index, q_func, epsilon)
+
+        # game_over = framework.gameOver(room_index, quest_index, action_index, object_index)
+        # if game_over:
+        #     print("############ THE GAME IS OVER ############")
+
+
+        next_room_desc, next_quest_desc, reward, terminal = framework.step_game(current_room_desc, current_quest_desc, action_index, object_index)
+        next_room_index = dict_room_desc[next_room_desc]
+        next_quest_index = dict_quest_desc[next_quest_desc]
 
         if for_training:
             # update Q-function.
-            # TODO Your code here
-            pass
+            # tabular_q_learning performs: Q(s,c) <- (1−alpha)*Q(s,c) + alpha*(R(s,c)+gamma*maxQ(s′,c′))
+            tabular_q_learning(q_func, room_index, quest_index, action_index,
+                               object_index, reward, next_room_index, next_quest_index,
+                               terminal)
+
 
         if not for_training:
             # update reward
-            # TODO Your code here
-            pass
+            # epi_reward: the summation over t of gammat^t * reward_t.
+            epi_reward  = epi_reward + reward*discount
+            # discount: gamma^t.
+            discount = discount*GAMMA
 
         # prepare next step
-        # TODO Your code here
+        current_room_desc = next_room_desc
+        current_quest_desc = next_quest_desc
 
     if not for_training:
         return epi_reward
@@ -152,7 +175,7 @@ def run_epoch():
     for _ in range(NUM_EPIS_TEST):
         rewards.append(run_episode(for_training=False))
 
-    return np.mean(np.array(rewardsrewards))
+    return np.mean(np.array(rewards))
 
 
 def run():
