@@ -122,7 +122,10 @@ def principal_components(centered_data):
         the largest eigenvalue
     """
     scatter_matrix = np.dot(centered_data.transpose(), centered_data)
-    eigen_values, eigen_vectors = np.linalg.eig(scatter_matrix)
+
+    # Use eigh (symmetric) instead of eig to guarantee real outputs
+    eigen_values, eigen_vectors = np.linalg.eigh(scatter_matrix)
+    # eigen_values, eigen_vectors = np.linalg.eig(scatter_matrix)
     # Re-order eigenvectors by eigenvalue magnitude:
     idx = eigen_values.argsort()[::-1]
     eigen_values = eigen_values[idx]
