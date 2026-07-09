@@ -7,7 +7,7 @@ from linear_regression import *
 from svm import *
 from softmax import *
 from features import *
-from kernel import *
+import kernel as kernelized
 
 from sklearn.svm import SVC
 
@@ -44,7 +44,7 @@ def run_linear_regression_on_MNIST(lambda_factor=1):
 
 
 # Don't run this until the relevant functions in linear_regression.py have been fully implemented.
-# print('Linear Regression test_error =', run_linear_regression_on_MNIST(lambda_factor=1))
+print('Linear Regression test_error =', run_linear_regression_on_MNIST(lambda_factor=1))
 
 #######################################################################
 # 3. Support Vector Machine
@@ -67,7 +67,7 @@ def run_svm_one_vs_rest_on_MNIST():
     return test_error
 
 
-# print('SVM one vs. rest test_error:', run_svm_one_vs_rest_on_MNIST())
+print('SVM one vs. rest test_error:', run_svm_one_vs_rest_on_MNIST())
 
 
 def run_multiclass_svm_on_MNIST():
@@ -83,7 +83,7 @@ def run_multiclass_svm_on_MNIST():
     return test_error
 
 
-# print('Multiclass SVM test_error:', run_multiclass_svm_on_MNIST())
+print('Multiclass SVM test_error:', run_multiclass_svm_on_MNIST())
 
 #######################################################################
 # 4. Multinomial (Softmax) Regression and Gradient Descent
@@ -116,10 +116,14 @@ def run_softmax_on_MNIST(temp_parameter=1):
 
     # TODO: add your code here for the "Using the Current Model" question in tab 6.
     #      and print the test_error_mod3
+    train_y_mod3, test_y_mod3 = update_y(train_y, test_y)
+    test_error_mod3 = compute_test_error_mod3(test_x, test_y_mod3, theta, temp_parameter)
+    print('run_softmax_on_MNIST - test_error_mod3=',test_error_mod3)
+
     return test_error
 
 
-# print('softmax test_error=', run_softmax_on_MNIST(temp_parameter=1))
+print('softmax test_error=', run_softmax_on_MNIST(temp_parameter=1))
 
 # TODO: Find the error rate for temp_parameter = [.5, 1.0, 2.0]
 #      Remember to return the tempParameter to 1, and re-run run_softmax_on_MNIST
@@ -173,7 +177,7 @@ def run_softmax_on_MNIST_mod3(temp_parameter=1):
 
 # TODO: Run run_softmax_on_MNIST_mod3(), report the error rate
 
-# print('softmax mod 3 test_error=', run_softmax_on_MNIST_mod3(temp_parameter=1))
+print('softmax mod 3 test_error=', run_softmax_on_MNIST_mod3(temp_parameter=1))
 
 
 def run_softmax_on_MNIST_PCA18(temp_parameter=1.0):
@@ -197,21 +201,20 @@ def run_softmax_on_MNIST_PCA18(temp_parameter=1.0):
     # 5) Evaluate on projected test set
     return compute_test_error(test_proj, test_y, theta, temp_parameter)
 
-# print('softmax PCA 18 test_error=', run_softmax_on_MNIST_PCA18(temp_parameter=1))
+print('softmax PCA 18 test_error=', run_softmax_on_MNIST_PCA18(temp_parameter=1))
 
 
 def run_softmax_on_MNIST_PCA10(temp_parameter=1.0):
     # 1) Load data
-    train_x, train_y, test_x, test_y = get_MNIST_data()   # shapes: (n,d), d=784
+    train_x, train_y, test_x, test_y = get_MNIST_data()
 
-    # 2) Fit PCA on the TRAINING data only
-    train_x = cubic_features(train_x)
-    pcs = principal_components(train_x)                   # (d,d), cols are unit eigenvectors
-    feature_means = np.mean(train_x, axis=0)              # (d,)
+    # 2) Fit PCA on training data only
+    pcs = principal_components(train_x)
+    feature_means = np.mean(train_x, axis=0)
 
-    # 3) Project train/test onto first 18 PCs using TRAIN means
-    train_proj = project_onto_PC(train_x, pcs, 10, feature_means)  # (n,18)
-    test_proj  = project_onto_PC(test_x,  pcs, 10, feature_means)  # (m,18)
+    # 3) Project BOTH train and test onto first 10 PCs
+    train_proj = project_onto_PC(train_x, pcs, 10, feature_means)  # (n, 10)
+    test_proj  = project_onto_PC(test_x,  pcs, 10, feature_means)  # (m, 10)
 
     # 4) Train softmax on 10 classes with projected features
     theta, _ = softmax_regression(
@@ -223,7 +226,7 @@ def run_softmax_on_MNIST_PCA10(temp_parameter=1.0):
     return compute_test_error(test_proj, test_y, theta, temp_parameter)
 
 
-# print('softmax PCA 10 test_error=', run_softmax_on_MNIST_PCA10(temp_parameter=1))
+print('softmax PCA 10 test_error=', run_softmax_on_MNIST_PCA10(temp_parameter=1))
 
 
 def run_softmax_on_MNIST_cubic_PCA10(temp_parameter=1.0):
@@ -259,7 +262,7 @@ def run_softmax_on_MNIST_cubic_PCA10(temp_parameter=1.0):
     # 6) Evaluate
     return compute_test_error(test_cubic, test_y, theta, temp_parameter)
 
-# print('softmax cubic PCA 10 test_error=', run_softmax_on_MNIST_cubic_PCA10(temp_parameter=1))
+print('softmax cubic PCA 10 test_error=', run_softmax_on_MNIST_cubic_PCA10(temp_parameter=1))
 
 
 def run_cubic_poly_svm_on_MNIST_PCA10():
@@ -380,7 +383,8 @@ plot_images(train_x[1, ])
 
 ## Cubic Kernel ##
 # TODO: Find the 10-dimensional PCA representation of the training and test set
-
+train_pca10 = project_onto_PC(train_x, pcs, n_components=10, feature_means=feature_means)
+test_pca10 = project_onto_PC(test_x, pcs, n_components=10, feature_means=feature_means)
 
 # TODO: First fill out cubicFeatures() function in features.py as the below code requires it.
 
@@ -392,3 +396,106 @@ test_cube = cubic_features(test_pca10)
 
 # TODO: Train your softmax regression model using (train_cube, train_y)
 #       and evaluate its accuracy on (test_cube, test_y).
+
+
+def run_polynomial_kernel_softmax_on_MNIST_PCA10(kernel_kwargs=None, temp_parameter=1.0):
+    """
+    Train/evaluate polynomial kernel softmax regression on 10-D PCA features.
+
+    kernel_kwargs are the keyword arguments for polynomial kernel, e.g.
+        {'c': 1, 'p': 3}
+
+    Returns:
+        Final test error.
+    """
+    if kernel_kwargs is None:
+        kernel_kwargs = {}
+
+    train_x, train_y, test_x, test_y = get_MNIST_data()
+
+    # Fit PCA on training data only.
+    centered_train_x, feature_means = center_data(train_x)
+    pcs = principal_components(centered_train_x)
+
+    # Use the 10-D PCA representation before applying the kernel.
+    train_pca10 = project_onto_PC(train_x, pcs, n_components=10, feature_means=feature_means)
+    test_pca10 = project_onto_PC(test_x, pcs, n_components=10, feature_means=feature_means)
+
+    # Subsample to avoid OOM (full 60k x 60k kernel ~29 GB)
+    n_sub = 10000
+    train_sub = train_pca10[:n_sub]
+    train_y_sub = train_y[:n_sub]
+
+    # Build training and test kernel matrices.
+    # train_kernel = kernelized.polynomial_kernel(train_pca10, train_pca10, **kernel_kwargs)
+    # test_kernel = kernelized.polynomial_kernel(test_pca10, train_pca10, **kernel_kwargs)
+    train_kernel = kernelized.polynomial_kernel(train_sub, train_sub, **kernel_kwargs)
+    test_kernel  = kernelized.polynomial_kernel(test_pca10, train_sub, **kernel_kwargs)
+
+    # Use the rewritten kernelized softmax functions from kernel.py.
+    # coefficients, cost_function_history = kernelized.softmax_regression(
+    #     train_kernel, train_y, temp_parameter,
+    #     alpha=0.3, lambda_factor=1e-4, k=10, num_iterations=150,
+    # )
+    coefficients, cost_function_history = kernelized.softmax_regression(
+        train_kernel, train_y_sub, temp_parameter,
+        alpha=0.3, lambda_factor=1e-4, k=10, num_iterations=150,
+    )
+
+    plot_cost_function_over_time(cost_function_history)
+    test_error = kernelized.compute_test_error(test_kernel, test_y, coefficients, temp_parameter)
+    return test_error
+
+
+print('polynomial kernel softmax PCA10 test_error=',run_polynomial_kernel_softmax_on_MNIST_PCA10({'c': 1, 'p': 3}))
+
+
+def run_gaussian_rbf_kernel_softmax_on_MNIST_PCA10(kernel_kwargs=None, temp_parameter=1.0):
+    """
+    Train/evaluate gaussian rbf kernel softmax regression on 10-D PCA features.
+
+    kernel_kwargs are the keyword arguments for gaussian rbf kernel, e.g.
+        {'gamma': 1.0}
+
+    Returns:
+        Final test error.
+    """
+    if kernel_kwargs is None:
+        kernel_kwargs = {}
+
+    train_x, train_y, test_x, test_y = get_MNIST_data()
+
+    # Fit PCA on training data only.
+    centered_train_x, feature_means = center_data(train_x)
+    pcs = principal_components(centered_train_x)
+
+    # Use the 10-D PCA representation before applying the kernel.
+    train_pca10 = project_onto_PC(train_x, pcs, n_components=10, feature_means=feature_means)
+    test_pca10 = project_onto_PC(test_x, pcs, n_components=10, feature_means=feature_means)
+
+    # Subsample to avoid OOM (full 60k x 60k kernel ~29 GB)
+    n_sub = 10000
+    train_sub = train_pca10[:n_sub]
+    train_y_sub = train_y[:n_sub]
+
+    # Build training and test kernel matrices.
+    # train_kernel = kernelized.rbf_kernel(train_pca10, train_pca10, **kernel_kwargs)
+    # test_kernel = kernelized.rbf_kernel(test_pca10, train_pca10, **kernel_kwargs)
+    train_kernel = kernelized.rbf_kernel(train_sub, train_sub, **kernel_kwargs)
+    test_kernel  = kernelized.rbf_kernel(test_pca10, train_sub, **kernel_kwargs)
+
+    # Use the rewritten kernelized softmax functions from kernel.py.
+    # coefficients, cost_function_history = kernelized.softmax_regression(
+    #     train_kernel, train_y, temp_parameter,
+    #     alpha=0.3, lambda_factor=1e-4, k=10, num_iterations=150,
+    # )
+    coefficients, cost_function_history = kernelized.softmax_regression(
+        train_kernel, train_y_sub, temp_parameter,
+        alpha=0.3, lambda_factor=1e-4, k=10, num_iterations=150,
+    )
+    plot_cost_function_over_time(cost_function_history)
+    test_error = kernelized.compute_test_error(test_kernel, test_y, coefficients, temp_parameter)
+    return test_error
+
+
+print('Gaussian RBF kernel softmax PCA10 test_error=',run_gaussian_rbf_kernel_softmax_on_MNIST_PCA10( {'gamma': 1.0}))

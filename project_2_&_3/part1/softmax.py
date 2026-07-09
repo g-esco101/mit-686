@@ -64,7 +64,9 @@ def compute_cost_function(X, Y, theta, lambda_factor, temp_parameter):
     probabilities = compute_probabilities(X, theta, temp_parameter)
     n = X.shape[0]
 
-    correct_probs_log = np.log(probabilities[Y, np.arange(n)])
+    # true_class_probs: For each sample i, extract the predicted probability assigned to its true class Y[i]; shape (n,)
+    true_class_probs = probabilities[Y, np.arange(n)]
+    correct_probs_log = np.log(true_class_probs)
     loss = -np.mean(correct_probs_log)
     l2 = (lambda_factor / 2) * np.sum(theta ** 2)
     c = loss + l2
@@ -90,9 +92,14 @@ def run_gradient_descent_iteration(X, Y, theta, alpha, lambda_factor, temp_param
     n = X.shape[0]
     k = theta.shape[0]
     probabilities = compute_probabilities(X, theta, temp_parameter)
+
+    # Build the one-hot indicator matrix M of shape (k, n):
+    # M[j, i] = 1 if sample i belongs to class j (i.e. Y[i] == j), else 0.
+    # Uses sparse COO format for efficiency, then converts to a dense array.
     M = sparse.coo_matrix(
         (np.ones(n), (Y, np.arange(n))), shape=(k, n)
     ).toarray()
+
     gradient = (-1 / (n * temp_parameter)) * np.dot((M - probabilities), X) + lambda_factor * theta
     theta -= alpha * gradient
     return theta
