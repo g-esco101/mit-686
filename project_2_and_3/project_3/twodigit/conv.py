@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from train_utils import batchify_data, run_epoch, train_model, Flatten
 import utils_multiMNIST as U
-path_to_data_dir = '../Datasets/'
+path_to_data_dir = '../../Datasets/'
 use_mini_dataset = True
 
 batch_size = 64
@@ -13,27 +13,59 @@ nb_epoch = 30
 num_classes = 10
 img_rows, img_cols = 42, 28 # input image dimensions
 
-class MLP(nn.Module):
+
+
+class CNN(nn.Module):
 
     def __init__(self, input_dimension):
-        super(MLP, self).__init__()
+        super(CNN, self).__init__()
+        # My solution
+        self.features = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+        )
         self.flatten = Flatten()
-        # initialize model layers
-        # one hidden layer with 64 units
-        self.fc1 = nn.Linear(input_dimension, 64)
-        # two separate output layers (one per digit)
-        self.head_first  = nn.Linear(64, 10)
-        self.head_second = nn.Linear(64, 10)
+        self.fc = nn.Linear(64 * 10 * 7, 128)
+        self.dropout = nn.Dropout(0.5)
+        self.head_first  = nn.Linear(128, 10)
+        self.head_second = nn.Linear(128, 10)
+        # MIT Solution
+        # self.linear1 = nn.Linear(input_dimension, 64)
+        # self.linear2 = nn.Linear(64, 64)
+        # self.linear_first_digit = nn.Linear(64, 10)
+        # self.linear_second_digit = nn.Linear(64, 10)
+        # self.encoder = nn.Sequential(
+        #       nn.Conv2d(1, 8, (3, 3)),
+        #       nn.ReLU(),
+        #       nn.MaxPool2d((2, 2)),
+        #       nn.Conv2d(8, 16, (3, 3)),
+        #       nn.ReLU(),
+        #       nn.MaxPool2d((2, 2)),
+        #       Flatten(),
+        #       nn.Linear(720, 128),
+        #       nn.Dropout(0.5),
+        # )
+        # self.first_digit_classifier = nn.Linear(128,10)
+        # self.second_digit_classifier = nn.Linear(128,10)
 
     def forward(self, x):
-        xf = self.flatten(x)
-        # use model layers to predict the two digits
-        xf = self.flatten(x)                  # (N, 42*28 = 1176)
-        h = F.relu(self.fc1(xf))              # (N, 64)
-        out_first_digit  = self.head_first(h) # (N, 10) logits
-        out_second_digit = self.head_second(h)# (N, 10) logits
-
+        # My solution
+        x = self.features(x)
+        x = self.flatten(x)
+        x = F.relu(self.fc(x))
+        x = self.dropout(x)
+        out_first_digit  = self.head_first(x)
+        out_second_digit = self.head_second(x)
         return out_first_digit, out_second_digit
+        # Solution from MIT
+        # out = self.encoder(x)
+        # out_first_digit = self.first_digit_classifier(out)
+        # out_second_digit = self.second_digit_classifier(out)
+        # return out_first_digit, out_second_digit
 
 def main():
     X_train, y_train, X_test, y_test = U.get_data(path_to_data_dir, use_mini_dataset)
@@ -57,7 +89,7 @@ def main():
 
     # Load model
     input_dimension = img_rows * img_cols
-    model = MLP(input_dimension) # TODO add proper layers to MLP class above
+    model = CNN(input_dimension) # TODO add proper layers to CNN class above
 
     # Train
     train_model(train_batches, dev_batches, model)

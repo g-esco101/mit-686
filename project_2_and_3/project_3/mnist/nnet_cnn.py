@@ -8,7 +8,7 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn as nn
 import sys
-sys.path.append("..")
+sys.path.append("../..")
 import utils
 from utils import *
 from train_utils import batchify_data, run_epoch, train_model, Flatten
@@ -42,23 +42,23 @@ def main():
 
     #################################
     ## Model specification TODO
-    model = nn.Sequential(
-              nn.Conv2d(1, 32, (3, 3)),
-              nn.ReLU(),
-              nn.MaxPool2d((2, 2)),
-            )
     # model = nn.Sequential(
-    #     nn.Conv2d(1, 32, kernel_size=3),
-    #     nn.ReLU(),
-    #     nn.MaxPool2d(kernel_size=2),
-    #     nn.Conv2d(32, 64, kernel_size=3),
-    #     nn.ReLU(),
-    #     nn.MaxPool2d(kernel_size=2),
-    #     Flatten(),
-    #     nn.Linear(64 * 5 * 5, 128),
-    #     nn.Dropout(p=0.5),
-    #     nn.Linear(128, 10)
-    # )
+    #           nn.Conv2d(1, 32, (3, 3)),
+    #           nn.ReLU(),
+    #           nn.MaxPool2d((2, 2)),
+    #         )
+    model = nn.Sequential(
+        nn.Conv2d(1, 32, kernel_size=3),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2),
+        nn.Conv2d(32, 64, kernel_size=3),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2),
+        Flatten(),
+        nn.Linear(64 * 5 * 5, 128),
+        nn.Dropout(p=0.5),
+        nn.Linear(128, 10)
+    )
     ##################################
 
     train_model(train_batches, dev_batches, model, nesterov=True)

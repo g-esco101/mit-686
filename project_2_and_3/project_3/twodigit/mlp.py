@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from train_utils import batchify_data, run_epoch, train_model, Flatten
 import utils_multiMNIST as U
-path_to_data_dir = '../Datasets/'
+path_to_data_dir = '../../Datasets/'
 use_mini_dataset = True
 
 batch_size = 64
@@ -13,45 +13,33 @@ nb_epoch = 30
 num_classes = 10
 img_rows, img_cols = 42, 28 # input image dimensions
 
-
-
-class CNN(nn.Module):
+class MLP(nn.Module):
 
     def __init__(self, input_dimension):
-        super(CNN, self).__init__()
-        # TODO initialize model layers here
-        # feature extractor
-        self.features = nn.Sequential(
-            # (N,1,42,28) -> (N,32,42,28)
-            nn.Conv2d(1, 32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            # -> (N,32,21,14)
-            nn.MaxPool2d(kernel_size=2),
-
-            # (N,32,21,14) -> (N,64,21,14)
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            # -> (N,64,10,7)
-            nn.MaxPool2d(kernel_size=2),
-        )
-
-        self.flatten = Flatten()                 # (N, 64*10*7) = (N, 4480)
-        self.fc = nn.Linear(64 * 10 * 7, 128)    # shared trunk
-        self.dropout = nn.Dropout(0.5)
-        # two classification heads (10 classes each)
-        self.head_first  = nn.Linear(128, 10)
-        self.head_second = nn.Linear(128, 10)
+        super(MLP, self).__init__()
+        self.flatten = Flatten()
+        self.fc1 = nn.Linear(input_dimension, 64)
+        self.head_first  = nn.Linear(64, 10)
+        self.head_second = nn.Linear(64, 10)
+        # MIT solution
+        # self.linear1 = nn.Linear(input_dimension, 64)
+        # self.linear2 = nn.Linear(64, 64)
+        # self.linear_first_digit = nn.Linear(64, 10)
+        # self.linear_second_digit = nn.Linear(64, 10)
 
     def forward(self, x):
-
-        # TODO use model layers to predict the two digits
-        x = self.features(x)
-        x = self.flatten(x)
-        x = F.relu(self.fc(x))
-        x = self.dropout(x)
-        out_first_digit  = self.head_first(x)
-        out_second_digit = self.head_second(x)
+        xf = self.flatten(x)
+        h = F.relu(self.fc1(xf))
+        out_first_digit  = self.head_first(h)
+        out_second_digit = self.head_second(h)
         return out_first_digit, out_second_digit
+        # MIT solution
+        # out1 = F.relu(self.linear1(xf))
+        # out2 = F.relu(self.linear2(out1))
+        # out_first_digit = self.linear_first_digit(out2)
+        # out_second_digit = self.linear_second_digit(out2)
+        # return out_first_digit, out_second_digit
+
 
 def main():
     X_train, y_train, X_test, y_test = U.get_data(path_to_data_dir, use_mini_dataset)
@@ -75,7 +63,7 @@ def main():
 
     # Load model
     input_dimension = img_rows * img_cols
-    model = CNN(input_dimension) # TODO add proper layers to CNN class above
+    model = MLP(input_dimension) # TODO add proper layers to MLP class above
 
     # Train
     train_model(train_batches, dev_batches, model)

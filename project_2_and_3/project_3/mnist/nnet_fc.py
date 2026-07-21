@@ -8,7 +8,7 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn as nn
 import sys
-sys.path.append("..")
+sys.path.append("../..")
 import utils
 from utils import *
 from train_utils import batchify_data, run_epoch, train_model
@@ -38,11 +38,16 @@ def main():
 
     #################################
     ## Model specification TODO
+    # model = nn.Sequential(
+    #           nn.Linear(784, 128),
+    #           nn.ReLU(),
+    #           nn.Linear(128, 10),
+    #         )
     model = nn.Sequential(
-              nn.Linear(784, 128),
-              nn.ReLU(),
-              nn.Linear(128, 10),
-            )
+        nn.Linear(784, 128),
+        nn.LeakyReLU(negative_slope=0.01),
+        nn.Linear(128, 10),
+    )
     lr=0.1
     momentum=0
     ##################################

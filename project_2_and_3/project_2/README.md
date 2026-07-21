@@ -1,4 +1,4 @@
-# MIT 6.86x — Project 2 Part 1: MNIST Digit Classification
+# MIT 6.86x — Project 2: MNIST Digit Classification
 
 ## Overview
 
@@ -10,7 +10,7 @@ regression through kernelized SVMs. Feature engineering techniques — including
 **Principal Component Analysis (PCA)** and an explicit **cubic feature map** —
 are used to reduce dimensionality and improve accuracy.
 
-This is **Project 2 (Part 1)** of
+This is **Project 2** of
 [MIT 6.86x: Machine Learning with Python — From Linear Models to Deep Learning](https://www.edx.org/course/machine-learning-with-python-from-linear-models-to).
 
 ---
@@ -33,7 +33,7 @@ pickle file at `../Datasets/mnist.pkl.gz`.
 ## Project Structure
 
 ```
-part1/
+project_2/
 ├── main.py               # Driver: runs every experiment end-to-end
 ├── linear_regression.py  # Closed-form L2-regularised linear regression
 ├── svm.py                # Binary (one-vs-rest) and multiclass linear SVM
@@ -179,7 +179,7 @@ Uncomment the desired `print(...)` line at the bottom of each section in
 `main.py` and run:
 
 ```bash
-cd project_2_\&_3/part1
+cd project_2_and_3/project_2
 python main.py
 ```
 
