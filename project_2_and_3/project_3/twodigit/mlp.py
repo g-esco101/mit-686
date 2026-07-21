@@ -18,22 +18,28 @@ class MLP(nn.Module):
     def __init__(self, input_dimension):
         super(MLP, self).__init__()
         self.flatten = Flatten()
-        # initialize model layers
-        # one hidden layer with 64 units
         self.fc1 = nn.Linear(input_dimension, 64)
-        # two separate output layers (one per digit)
         self.head_first  = nn.Linear(64, 10)
         self.head_second = nn.Linear(64, 10)
+        # MIT solution
+        # self.linear1 = nn.Linear(input_dimension, 64)
+        # self.linear2 = nn.Linear(64, 64)
+        # self.linear_first_digit = nn.Linear(64, 10)
+        # self.linear_second_digit = nn.Linear(64, 10)
 
     def forward(self, x):
         xf = self.flatten(x)
-        # use model layers to predict the two digits
-        xf = self.flatten(x)                  # (N, 42*28 = 1176)
-        h = F.relu(self.fc1(xf))              # (N, 64)
-        out_first_digit  = self.head_first(h) # (N, 10) logits
-        out_second_digit = self.head_second(h)# (N, 10) logits
-
+        h = F.relu(self.fc1(xf))
+        out_first_digit  = self.head_first(h)
+        out_second_digit = self.head_second(h)
         return out_first_digit, out_second_digit
+        # MIT solution
+        # out1 = F.relu(self.linear1(xf))
+        # out2 = F.relu(self.linear2(out1))
+        # out_first_digit = self.linear_first_digit(out2)
+        # out_second_digit = self.linear_second_digit(out2)
+        # return out_first_digit, out_second_digit
+
 
 def main():
     X_train, y_train, X_test, y_test = U.get_data(path_to_data_dir, use_mini_dataset)

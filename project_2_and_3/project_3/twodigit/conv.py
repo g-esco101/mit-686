@@ -19,32 +19,41 @@ class CNN(nn.Module):
 
     def __init__(self, input_dimension):
         super(CNN, self).__init__()
-        # TODO initialize model layers here
-        # feature extractor
+        # My solution
         self.features = nn.Sequential(
-            # (N,1,42,28) -> (N,32,42,28)
             nn.Conv2d(1, 32, kernel_size=3, padding=1),
             nn.ReLU(),
-            # -> (N,32,21,14)
             nn.MaxPool2d(kernel_size=2),
-
-            # (N,32,21,14) -> (N,64,21,14)
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.ReLU(),
-            # -> (N,64,10,7)
             nn.MaxPool2d(kernel_size=2),
         )
-
-        self.flatten = Flatten()                 # (N, 64*10*7) = (N, 4480)
-        self.fc = nn.Linear(64 * 10 * 7, 128)    # shared trunk
+        self.flatten = Flatten()
+        self.fc = nn.Linear(64 * 10 * 7, 128)
         self.dropout = nn.Dropout(0.5)
-        # two classification heads (10 classes each)
         self.head_first  = nn.Linear(128, 10)
         self.head_second = nn.Linear(128, 10)
+        # MIT Solution
+        # self.linear1 = nn.Linear(input_dimension, 64)
+        # self.linear2 = nn.Linear(64, 64)
+        # self.linear_first_digit = nn.Linear(64, 10)
+        # self.linear_second_digit = nn.Linear(64, 10)
+        # self.encoder = nn.Sequential(
+        #       nn.Conv2d(1, 8, (3, 3)),
+        #       nn.ReLU(),
+        #       nn.MaxPool2d((2, 2)),
+        #       nn.Conv2d(8, 16, (3, 3)),
+        #       nn.ReLU(),
+        #       nn.MaxPool2d((2, 2)),
+        #       Flatten(),
+        #       nn.Linear(720, 128),
+        #       nn.Dropout(0.5),
+        # )
+        # self.first_digit_classifier = nn.Linear(128,10)
+        # self.second_digit_classifier = nn.Linear(128,10)
 
     def forward(self, x):
-
-        # TODO use model layers to predict the two digits
+        # My solution
         x = self.features(x)
         x = self.flatten(x)
         x = F.relu(self.fc(x))
@@ -52,6 +61,11 @@ class CNN(nn.Module):
         out_first_digit  = self.head_first(x)
         out_second_digit = self.head_second(x)
         return out_first_digit, out_second_digit
+        # Solution from MIT
+        # out = self.encoder(x)
+        # out_first_digit = self.first_digit_classifier(out)
+        # out_second_digit = self.second_digit_classifier(out)
+        # return out_first_digit, out_second_digit
 
 def main():
     X_train, y_train, X_test, y_test = U.get_data(path_to_data_dir, use_mini_dataset)

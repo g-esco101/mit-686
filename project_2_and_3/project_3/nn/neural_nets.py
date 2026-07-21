@@ -70,6 +70,7 @@ class NeuralNetwork():
 
         # output pre-activation and activation
         output = self.hidden_to_output_weights @ hidden_layer_activation  # (1×1)
+        # activated_output is the prediction
         activated_output = np.matrix(out_act(output))  # (1×1)
 
         ### Backpropagation ###
@@ -108,17 +109,32 @@ class NeuralNetwork():
 
     # Run this to train your neural network once you complete the train method
     def train_neural_network(self):
-
         for epoch in range(self.epochs_to_train):
             for x,y in self.training_points:
                 self.train(x[0], x[1], y)
+
+            print(f"\nEpoch {epoch + 1}")
+
+            for x, y in self.training_points:
+                prediction = self.predict(x[0], x[1])
+                absolute_error = abs(prediction - y)
+                cost = 0.5 * (prediction - y) ** 2
+
+                print(
+                    f"x={x}, "
+                    f"target={y:.6f}, "
+                    f"prediction={prediction:.6f}, "
+                    f"absolute_error={absolute_error:.6f}, "
+                    f"cost={cost:.6f}"
+                )
 
     # Run this to test your neural network implementation for correctness after it is trained
     def test_neural_network(self):
 
         for point in self.testing_points:
-            print("Point,", point, "Prediction,", self.predict(point[0], point[1]))
-            if abs(self.predict(point[0], point[1]) - 7*point[0]) < 0.1:
+            prediction = self.predict(point[0], point[1])
+            print("Point:", point, "; Prediction:", prediction)
+            if abs(prediction - 7*point[0]) < 0.1:
                 print("Test Passed")
             else:
                 print("Point ", point[0], point[1], " failed to be predicted correctly.")

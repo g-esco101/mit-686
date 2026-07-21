@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import _pickle as c_pickle, gzip
+import _pickle as cPickle, gzip
 import numpy as np
 from tqdm import tqdm
 import torch
@@ -11,16 +11,12 @@ import sys
 sys.path.append("..")
 import utils
 from utils import *
-from train_utils import batchify_data, run_epoch, train_model, Flatten
+from train_utils import batchify_data, run_epoch, train_model
 
 def main():
     # Load the dataset
     num_classes = 10
     X_train, y_train, X_test, y_test = get_MNIST_data()
-
-    # We need to rehape the data back into a 1x28x28 image
-    X_train = np.reshape(X_train, (X_train.shape[0], 1, 28, 28))
-    X_test = np.reshape(X_test, (X_test.shape[0], 1, 28, 28))
 
     # Split into train and dev
     dev_split_index = int(9 * len(X_train) / 10)
@@ -42,26 +38,21 @@ def main():
 
     #################################
     ## Model specification TODO
-    model = nn.Sequential(
-              nn.Conv2d(1, 32, (3, 3)),
-              nn.ReLU(),
-              nn.MaxPool2d((2, 2)),
-            )
     # model = nn.Sequential(
-    #     nn.Conv2d(1, 32, kernel_size=3),
-    #     nn.ReLU(),
-    #     nn.MaxPool2d(kernel_size=2),
-    #     nn.Conv2d(32, 64, kernel_size=3),
-    #     nn.ReLU(),
-    #     nn.MaxPool2d(kernel_size=2),
-    #     Flatten(),
-    #     nn.Linear(64 * 5 * 5, 128),
-    #     nn.Dropout(p=0.5),
-    #     nn.Linear(128, 10)
-    # )
+    #           nn.Linear(784, 128),
+    #           nn.ReLU(),
+    #           nn.Linear(128, 10),
+    #         )
+    model = nn.Sequential(
+        nn.Linear(784, 128),
+        nn.LeakyReLU(negative_slope=0.01),
+        nn.Linear(128, 10),
+    )
+    lr=0.1
+    momentum=0
     ##################################
 
-    train_model(train_batches, dev_batches, model, nesterov=True)
+    train_model(train_batches, dev_batches, model, lr=lr, momentum=momentum)
 
     ## Evaluate the model on test data
     loss, accuracy = run_epoch(test_batches, model.eval(), None)
@@ -72,5 +63,5 @@ def main():
 if __name__ == '__main__':
     # Specify seed for deterministic behavior, then shuffle. Do not change seed for official submissions to edx
     np.random.seed(12321)  # for reproducibility
-    torch.manual_seed(12321)
+    torch.manual_seed(12321)  # for reproducibility
     main()
