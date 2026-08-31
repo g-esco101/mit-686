@@ -1,4 +1,4 @@
-# MIT 6.86x --- Project 4: Gaussian Mixture Models and Matrix Completion
+# MIT 6.86x — Project 4: Gaussian Mixture Models and Matrix Completion
 
 ## Overview
 
@@ -22,7 +22,48 @@ then used to predict missing movie ratings.
 -   Netflix rating matrix completion
 -   RMSE evaluation against known ratings
 
-## Technologies
+## Project Structure
+
+The project is organized around the following components:
+
+### `common.py`
+
+Shared data structures and utilities, including Gaussian-mixture
+representation, initialization, plotting, BIC, and RMSE functionality.
+
+### `kmeans.py`
+
+K-means implementation used as the baseline clustering method.
+
+### `naive_em.py`
+
+EM implementation for the complete-data toy mixture model.
+
+### `em.py`
+
+Extension of EM for partially observed vectors.
+
+Key functions include:
+
+-   `estep()` --- computes soft assignments using observed coordinates
+-   `mstep()` --- updates means, variances, and mixture probabilities
+-   `run()` --- iterates E and M steps until convergence
+-   `fill_matrix()` --- predicts missing matrix entries
+
+### `main.py`
+
+Runs the experiments and reports:
+
+-   K-means results
+-   naive EM results
+-   BIC/model selection
+-   Netflix EM results
+-   matrix-completion predictions
+-   RMSE
+
+------------------------------------------------------------------------
+
+## Technologies Used
 
 -   **Python**
 -   **NumPy** --- numerical computation and matrix operations
@@ -176,7 +217,7 @@ Netflix dataset.
 
 ------------------------------------------------------------------------
 
-# Model Selection with BIC
+## Model Selection with BIC
 
 Increasing the number of mixture components generally improves
 likelihood, but also increases model complexity.
@@ -245,7 +286,7 @@ $K=4$, but BIC penalizes the additional parameters and prefers $K=3$.
 
 ------------------------------------------------------------------------
 
-# Handling Missing Data
+## Handling Missing Data
 
 The Netflix rating matrix contains many missing values, represented by
 `0`.
@@ -305,7 +346,7 @@ incorrectly interpreting missing entries as actual ratings.
 
 ------------------------------------------------------------------------
 
-# Netflix Matrix Completion
+## Netflix Matrix Completion
 
 Once the mixture model has been trained, missing ratings can be
 predicted from the posterior component probabilities.
@@ -324,7 +365,7 @@ corresponding component means.
 
 ------------------------------------------------------------------------
 
-## Netflix Results
+## Results
 
 The incomplete Netflix dataset was evaluated with $K=1$ and $K=12$,
 using seeds `0, 1, 2, 3, 4`.
@@ -344,77 +385,6 @@ $$
 
 The predictions therefore differed from the known target ratings by
 approximately 0.48 rating points on average in RMSE terms.
-
-------------------------------------------------------------------------
-
-## Implementation Structure
-
-The project is organized around the following components:
-
-### `common.py`
-
-Shared data structures and utilities, including Gaussian-mixture
-representation, initialization, plotting, BIC, and RMSE functionality.
-
-### `kmeans.py`
-
-K-means implementation used as the baseline clustering method.
-
-### `naive_em.py`
-
-EM implementation for the complete-data toy mixture model.
-
-### `em.py`
-
-Extension of EM for partially observed vectors.
-
-Key functions include:
-
--   `estep()` --- computes soft assignments using observed coordinates
--   `mstep()` --- updates means, variances, and mixture probabilities
--   `run()` --- iterates E and M steps until convergence
--   `fill_matrix()` --- predicts missing matrix entries
-
-### `main.py`
-
-Runs the experiments and reports:
-
--   K-means results
--   naive EM results
--   BIC/model selection
--   Netflix EM results
--   matrix-completion predictions
--   RMSE
-
-------------------------------------------------------------------------
-
-## Overall Workflow
-
-``` text
-                 Input data
-                     │
-          ┌──────────┴──────────┐
-          │                     │
-       K-means             Gaussian Mixture
-          │                     │
-    clustering cost          E-step
-                                │
-                              M-step
-                                │
-                           convergence
-                                │
-                              BIC
-                                │
-                       Select model / K
-                                │
-                     Netflix incomplete data
-                                │
-                         Train EM (K=12)
-                                │
-                       Predict missing values
-                                │
-                              RMSE
-```
 
 ------------------------------------------------------------------------
 
@@ -441,7 +411,7 @@ Runs the experiments and reports:
 
 ## Course
 
-This project was completed as part of **MIT 6.86x --- Machine Learning
+This project was completed as part of **MIT 6.86x — Machine Learning
 with Python: From Linear Models to Deep Learning**.
 
 It provides hands-on experience with unsupervised learning,

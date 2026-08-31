@@ -41,6 +41,24 @@ project_3/
 
 ---
 
+## Technologies Used
+
+| Technology | Purpose |
+|---|---|
+| **Python 3** | Primary language |
+| **PyTorch** — `torch.nn`, `torch.optim`, `torch.nn.functional` | Network construction, loss functions, optimizers |
+| **NumPy** | Manual backpropagation, numerical computation |
+| **tqdm** | Training progress bars |
+| **gzip / pickle** | Dataset serialization and loading |
+
+### Data Preprocessing & ML Engineering
+- **Batching** and **shuffling** of training data each epoch
+- **Train / validation / test splits** on all datasets
+- **Normalization** of pixel values
+- Models were evaluated on training, validation, and held-out test sets to monitor learning progress and detect overfitting
+
+---
+
 ## How to Run
 
 ```bash
@@ -173,25 +191,7 @@ Models were evaluated using training, validation, and held-out test sets to moni
 
 ---
 
-## Technologies Used
-
-| Technology | Purpose |
-|---|---|
-| **Python 3** | Primary language |
-| **PyTorch** — `torch.nn`, `torch.optim`, `torch.nn.functional` | Network construction, loss functions, optimizers |
-| **NumPy** | Manual backpropagation, numerical computation |
-| **tqdm** | Training progress bars |
-| **gzip / pickle** | Dataset serialization and loading |
-
-### Data Preprocessing & ML Engineering
-- **Batching** and **shuffling** of training data each epoch
-- **Train / validation / test splits** on all datasets
-- **Normalization** of pixel values
-- Models were evaluated on training, validation, and held-out test sets to monitor learning progress and detect overfitting
-
----
-
-## Key Learning Outcomes
+## Key Takeaways
 
 - Implemented forward propagation, manual gradient computation, and backpropagation from scratch before using PyTorch's built-in gradient computation and optimization workflow
 - Built and compared feedforward vs. convolutional architectures, understanding *why* CNNs outperform dense networks on image data
@@ -199,3 +199,11 @@ Models were evaluated using training, validation, and held-out test sets to moni
 - Applied regularization techniques: **Dropout**, **SGD momentum**, **Nesterov acceleration**
 - Compared training and validation performance across architectures to study overfitting and generalization
 - Gained hands-on experience with core PyTorch modules: `torch.nn.Module`, `torch.nn.Conv2d`, `torch.nn.Linear`, `torch.optim.SGD`, `torch.nn.functional.cross_entropy`
+
+---
+
+## Course
+
+This project was completed as part of **MIT 6.86x — Machine Learning with Python: From Linear Models to Deep Learning**.
+
+It provides hands-on experience with neural network foundations, PyTorch model design, convolutional architectures, regularization, and multi-task learning.

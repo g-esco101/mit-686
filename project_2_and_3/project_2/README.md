@@ -165,7 +165,7 @@ MNIST raw (784-D)
 
 ---
 
-## Getting Started
+## How to Run
 
 ### Prerequisites
 
@@ -196,7 +196,7 @@ plot_images(train_x[:20])
 
 ---
 
-## Typical Results
+## Results
 
 | Method                                      | Test Error |
 |---------------------------------------------|------------|
@@ -214,7 +214,22 @@ plot_images(train_x[:20])
 | Kernelized Softmax Polynomial + PCA 10     | 0.0935     |
 | Kernelized Softmax Gaussian RBF + PCA 10   | 0.0938     |
 
-
 > Exact numbers depend on random seed and any hyperparameter tuning performed.
 
 ---
+
+## Key Takeaways
+
+- Closed-form linear regression is a weak baseline for image classification — rounding predictions to integer labels is a poor substitute for a proper classifier.
+- SVMs with a linear kernel achieve strong accuracy with minimal tuning.
+- PCA reduces dimensionality and training cost while preserving most of the discriminative signal.
+- The explicit cubic feature map allows a linear classifier to learn cubic decision boundaries without the kernel trick, at the cost of a larger feature vector.
+- Kernelized methods (polynomial and RBF) achieve competitive accuracy without explicitly computing high-dimensional feature maps.
+
+---
+
+## Course
+
+This project was completed as part of **MIT 6.86x — Machine Learning with Python: From Linear Models to Deep Learning**.
+
+It provides hands-on experience with supervised learning, feature engineering, kernel methods, and dimensionality reduction on a real image classification benchmark.
