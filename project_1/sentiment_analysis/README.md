@@ -56,16 +56,9 @@ All classifiers are implemented **from scratch** using NumPy:
 - **`reviews.tsv`** — Amazon product reviews with labels (+1 positive, −1 negative), review titles, and text
 - **`toy_data.tsv`** — 2D labeled dataset used to visualize decision boundaries
 
-## Key Concepts Demonstrated
+## How to Run
 
-- Linear classification and decision boundaries
-- Online vs. batch learning
-- Regularization and the bias-variance tradeoff
-- Hyperparameter tuning (number of epochs `T`, regularization strength `λ`)
-- Text preprocessing and bag-of-words representation
-- Binary vs. count-based feature vectors
-
-## Running the Tests
+### Run the Test Suite
 
 ```bash
 python test.py
@@ -73,7 +66,7 @@ python test.py
 
 The test suite validates each component including loss functions, update steps, full training loops, bag-of-words construction, and feature extraction.
 
-## Running Experiments
+### Run Experiments
 
 Different experiments can be enabled by commenting and uncommenting the relevant sections in `main.py`. For example:
 
@@ -82,11 +75,29 @@ Different experiments can be enabled by commenting and uncommenting the relevant
 - To switch between binary and non-binary bag-of-words features, modify the `extract_bow_feature_vectors` call in the feature extraction section.
 - To test on the toy dataset vs. the sentiment dataset, comment/uncomment the respective `load_toy_data` or `load_data` calls.
 
-After configuring `main.py`, run the project with:
+After configuring `main.py`, run:
 
 ```bash
 python main.py
 ```
 
-## Example Results
+## Results
+
 The classifier is evaluated on held-out Amazon reviews. Performance is measured by accuracy on both training and validation sets across varying hyperparameters T and λ.
+
+---
+
+## Key Takeaways
+
+- Linear classification and decision boundaries
+- Online vs. batch learning
+- Regularization and the bias-variance tradeoff
+- Hyperparameter tuning (number of epochs `T`, regularization strength `λ`)
+- Text preprocessing and bag-of-words representation
+- Binary vs. count-based feature vectors
+
+## Course
+
+This project was completed as part of **MIT 6.86x — Machine Learning with Python: From Linear Models to Deep Learning**.
+
+It provides hands-on experience with linear classification, online learning, regularization, text preprocessing, and hyperparameter tuning.

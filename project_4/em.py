@@ -153,13 +153,13 @@ def run(X: np.ndarray, mixture: GaussianMixture,
         # e-step
         post, log_likelihood = estep(X, mixture)
 
-        # m-step
-        mixture = mstep(X, post, mixture)
-
         # Convergence check
         if log_likelihood_prev is not None:
             if log_likelihood - log_likelihood_prev <= 1e-6 * abs(log_likelihood):
                 break
+
+        # m-step
+        mixture = mstep(X, post, mixture)
 
         log_likelihood_prev = log_likelihood
 
